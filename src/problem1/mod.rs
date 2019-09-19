@@ -37,8 +37,7 @@ pub fn calculate_frequency(data: &str) -> i32 {
 pub fn find_duplicated(data: &str) -> i32 {
     let mut frequencies = HashSet::new();
     let mut current_frequency = 0;
-    let not_found = true;
-    while not_found {
+    loop {
         for line in data.lines() {
             let line = line.parse::<i32>().unwrap();
             current_frequency += line;
