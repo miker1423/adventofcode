@@ -76,7 +76,7 @@ fn process_log(data: BTreeMap<NaiveDateTime, EventType>) -> HashMap<i32, GuardSl
         match event {
             EventType::StartedGuard(id) => {
                 guard_id = *id;
-                map.entry(guard_id).or_insert_with(|| vec![0; 60]);
+                map.entry(guard_id).or_insert([0;60]);
             },
             EventType::FallAsleep(minute) => start_sleeping = *minute,
             EventType::WokeUp(minute) => {
@@ -89,7 +89,7 @@ fn process_log(data: BTreeMap<NaiveDateTime, EventType>) -> HashMap<i32, GuardSl
     }
 
     let mut result = HashMap::new();
-    let tuples = map.into_iter().map(|(id, histogram)| {
+    map.into_iter().for_each(|(id, histogram)| {
         let most_slept = most_slept(&histogram);
         let sum: u32 = histogram.into_iter().sum();
         let guard = GuardSleepTime {
@@ -97,12 +97,8 @@ fn process_log(data: BTreeMap<NaiveDateTime, EventType>) -> HashMap<i32, GuardSl
             most_slept_min: most_slept.0 as u32,
             most_slept_quantity: most_slept.1
         };
-        (id, guard)
-    });
-
-    for (id, guard) in tuples {
         result.insert(id, guard);
-    }
+    });
     result
 }
 
@@ -118,7 +114,7 @@ fn most_slept(histogram: &[u32]) -> (usize, u32) {
     (index, max)
 }
 
-fn mark_histogram(histogram: &mut Vec<u32>, start: usize, end: usize) {
+fn mark_histogram(histogram: &mut [u32], start: usize, end: usize) {
     for i in start..end {
         histogram[i] += 1;
     }
